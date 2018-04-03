@@ -2,7 +2,7 @@
 
 TMP_FOLDER=$(mktemp -d)
 CONFIG_FILE='interzone.conf'
-CONFIGFOLDER='~/.interzone'
+CONFIGFOLDER='.interzone'
 COIN_DAEMON='/usr/local/bin/interzoned'
 COIN_CLI='/usr/local/bin/interzone-cli'
 COIN_REPO='https://github.com/projectinterzone/Linux-Client/archive/master.zip'
@@ -74,10 +74,10 @@ EOF
 
 
 function create_config() {
-  mkdir $CONFIGFOLDER >/dev/null 2>&1
+  mkdir ~/$CONFIGFOLDER #>/dev/null 2>&1
   RPCUSER=$(pwgen -s 8 1)
   RPCPASSWORD=$(pwgen -s 15 1)
-  cat << EOF > $CONFIGFOLDER/$CONFIG_FILE
+  cat << EOF > ~/$CONFIGFOLDER/$CONFIG_FILE
 rpcuser=$RPCUSER
 rpcpassword=$RPCPASSWORD
 rpcallowip=127.0.0.1
@@ -111,8 +111,8 @@ clear
 }
 
 function update_config() {
-  sed -i 's/daemon=1/daemon=0/' $CONFIGFOLDER/$CONFIG_FILE
-  cat << EOF >> $CONFIGFOLDER/$CONFIG_FILE
+  sed -i 's/daemon=1/daemon=0/' ~/$CONFIGFOLDER/$CONFIG_FILE
+  cat << EOF >> ~/$CONFIGFOLDER/$CONFIG_FILE
 logintimestamps=1
 maxconnections=256
 bind=$NODEIP
@@ -186,10 +186,10 @@ if [[ $(lsb_release -d) != *16.04* ]]; then
   exit 1
 fi
 
-#if [[ $EUID -ne 0 ]]; then
-#   echo -e "${RED}$0 must be run as root or a user with root privileges.${NC}"
-#   exit 1
-#fi
+if [[ sudo $EUID -ne 0 ]]; then
+   echo -e "${RED}$0 must be run as root or a user with root privileges.${NC}"
+   exit 1
+fi
 
 if [ -n "$(pidof $COIN_DAEMON)" ] || [ -e "$COIN_DAEMOM" ] ; then
   echo -e "${RED}$COIN_NAME is already installed.${NC}"
@@ -234,7 +234,7 @@ function important_information() {
  echo
  echo -e "================================================================================================================================"
  echo -e "$COIN_NAME Masternode is up and running listening on port ${GREEN}$COIN_PORT${NC}."
- echo -e "Configuration file is: ${RED}$CONFIGFOLDER/$CONFIG_FILE${NC}"
+ echo -e "Configuration file is: ${RED}$~/CONFIGFOLDER/$CONFIG_FILE${NC}"
  echo -e "Start: ${RED}systemctl start $COIN_NAME.service${NC}"
  echo -e "Stop: ${RED}systemctl stop $COIN_NAME.service${NC}"
  echo -e "VPS_IP:PORT ${RED}$NODEIP:$COIN_PORT${NC}"
