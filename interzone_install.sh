@@ -187,7 +187,7 @@ if [[ $(lsb_release -d) != *16.04* ]]; then
   exit 1
 fi
 
-if [ $EUID -ne 0 ] && [ `sudo whoami` != 'root']; then
+if [ $EUID -ne 0 ] && [ `sudo whoami` != 'root' ]; then
    echo -e "${RED}$0 must be run as root or a user with root privileges.${NC}"
    exit 1
 fi
