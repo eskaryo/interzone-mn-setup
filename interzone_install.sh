@@ -33,7 +33,7 @@ function compile_node() {
 }
 
 function configure_systemd() {
-sudo cat << EOF > /etc/systemd/system/$COIN_NAME.service
+cat << EOF > $COIN_NAME.service
 [Unit]
 Description=$COIN_NAME service
 After=network.target
@@ -57,6 +57,7 @@ StartLimitBurst=5
 [Install]
 WantedBy=multi-user.target
 EOF
+sudo cp $COIN_NAME.service /etc/systemd/system/
 
   sudo systemctl daemon-reload
   sleep 3
@@ -74,7 +75,7 @@ EOF
 
 
 function create_config() {
-  mkdir ~/$CONFIGFOLDER #>/dev/null 2>&1
+  mkdir ~/$CONFIGFOLDER >/dev/null 2>&1
   RPCUSER=$(pwgen -s 8 1)
   RPCPASSWORD=$(pwgen -s 15 1)
   cat << EOF > ~/$CONFIGFOLDER/$CONFIG_FILE
@@ -186,7 +187,7 @@ if [[ $(lsb_release -d) != *16.04* ]]; then
   exit 1
 fi
 
-if [[ sudo $EUID -ne 0 ]]; then
+if [ $EUID -ne 0 ] && [ `sudo whoami` != 'root']; then
    echo -e "${RED}$0 must be run as root or a user with root privileges.${NC}"
    exit 1
 fi
@@ -234,7 +235,7 @@ function important_information() {
  echo
  echo -e "================================================================================================================================"
  echo -e "$COIN_NAME Masternode is up and running listening on port ${GREEN}$COIN_PORT${NC}."
- echo -e "Configuration file is: ${RED}$~/CONFIGFOLDER/$CONFIG_FILE${NC}"
+ echo -e "Configuration file is: ${RED}$~/$CONFIGFOLDER/$CONFIG_FILE${NC}"
  echo -e "Start: ${RED}systemctl start $COIN_NAME.service${NC}"
  echo -e "Stop: ${RED}systemctl stop $COIN_NAME.service${NC}"
  echo -e "VPS_IP:PORT ${RED}$NODEIP:$COIN_PORT${NC}"
