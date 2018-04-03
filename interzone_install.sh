@@ -9,6 +9,7 @@ COIN_REPO='https://github.com/projectinterzone/Linux-Client/archive/master.zip'
 COIN_NAME='Interzone'
 COIN_PORT=55675
 RPCPORT=55680
+USER_NAME=`whoami`
 
 
 NODEIP=$(curl -s4 icanhazip.com)
@@ -38,8 +39,8 @@ Description=$COIN_NAME service
 After=network.target
 
 [Service]
-User=root
-Group=root
+User=$USER_NAME
+Group=$USER_NAME
 
 Type=forking
 
@@ -241,8 +242,8 @@ function important_information() {
 }
 
 function configure_logcleanup() {
-line="* */2 * * * >/`whoami`/.interzone/debug.log"
-(crontab -u `whoami` -l; echo "$line" ) | crontab -u `whoami` -
+line="* */2 * * * >/$USER_NAME/.interzone/debug.log"
+(crontab -u $USER_NAME -l; echo "$line" ) | crontab -u $USER_NAME -
 }
 
 function setup_node() {
