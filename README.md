@@ -1,20 +1,20 @@
-# Stipend
-Shell script to install a [Stipend Masternode](http://stipend.me) on a Linux server running Ubuntu 16.04. Use it on your own risk.  
+# Interzone
+Shell script to install a [Interzone Masternode](http://interzone.space) on a Linux server running Ubuntu 16.04. Use it on your own risk.  
 
 ***
 ## Installation:  
 
-wget -q https://raw.githubusercontent.com/zoldur/Stipend/master/stipend_install.sh  
-bash stipend_install.sh
+wget -q https://raw.githubusercontent.com/eskaryo/interzone-mn-setup/master/interzone_install.sh
+bash interzone_install.sh
 ***
 
 ## Desktop wallet setup  
 
 After the MN is up and running, you need to configure the desktop wallet accordingly. Here are the steps:  
-1. Open the Stipend Desktop Wallet.  
+1. Open the Interzone Desktop Wallet.  
 2. Go to RECEIVE and create a New Address: **MN1**  
-3. Send **5000** SPD to **MN1**.  
-4. Wait for 15 confirmations.  
+3. Send **5000** ITZ to **MN1**.  
+4. Wait for 30 confirmations.  
 5. Go to **Help -> "Debug window - Console"**  
 6. Type the following command: **masternode outputs**  
 7. Go to **Masternodes** tab  
@@ -34,17 +34,17 @@ After the MN is up and running, you need to configure the desktop wallet accordi
 ## Usage:  
 
 ```
-stipendd masternode status
-stipendd getinfo
+interzoned masternode status
+interzoned getinfo
 ```  
 
-Also, if you want to check/start/stop **Stipend** , run one of the following commands as **root**:
+Also, if you want to check/start/stop **Interzone** , run one of the following commands as **root**:
 
 ``` 
-systemctl status Stipend #To check the service is running.  
-systemctl start Stipend #To start Stipend service.  
-systemctl stop Stipend #To stop Stipend service.  
-systemctl is-enabled Stipend #To check whetether Stipend service is enabled on boot or not.  
+systemctl status Interzone #To check the service is running.  
+systemctl start Interzone #To start Interzone service.  
+systemctl stop Interzone #To stop Interzone service.  
+systemctl is-enabled Interzone #To check whetether Interzone service is enabled on boot or not.  
 ```  
 ***
 
