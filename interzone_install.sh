@@ -2,7 +2,7 @@
 
 TMP_FOLDER=$(mktemp -d)
 CONFIG_FILE='interzone.conf'
-CONFIGFOLDER='/root/.interzone'
+CONFIGFOLDER='~/.interzone'
 COIN_DAEMON='/usr/local/bin/interzoned'
 COIN_CLI='/usr/local/bin/interzone-cli'
 COIN_REPO='https://github.com/projectinterzone/Linux-Client/archive/master.zip'
@@ -27,12 +27,12 @@ function compile_node() {
   cd Linux-Client-master
   tar xvf Interzone-1.5.2.7.tar.bz2
   cd Interzone-1.5.2.7
-  cp * /usr/local/bin
+  sudo cp * /usr/local/bin
   clear
 }
 
 function configure_systemd() {
-  cat << EOF > /etc/systemd/system/$COIN_NAME.service
+sudo cat << EOF > /etc/systemd/system/$COIN_NAME.service
 [Unit]
 Description=$COIN_NAME service
 After=network.target
@@ -57,13 +57,13 @@ StartLimitBurst=5
 WantedBy=multi-user.target
 EOF
 
-  systemctl daemon-reload
+  sudo systemctl daemon-reload
   sleep 3
-  systemctl start $COIN_NAME.service
-  systemctl enable $COIN_NAME.service >/dev/null 2>&1
+  sudo systemctl start $COIN_NAME.service
+  sudo systemctl enable $COIN_NAME.service >/dev/null 2>&1
 
-  if [[ -z "$(ps axo cmd:100 | egrep $COIN_DAEMON)" ]]; then
-    echo -e "${RED}$COIN_NAME is not running${NC}, please investigate. You should start by running the following commands as root:"
+  if [[ -z "$(sudo ps axo cmd:100 | egrep $COIN_DAEMON)" ]]; then
+    echo -e "${RED}$COIN_NAME is not running${NC}, please investigate. You should start by running the following commands as root/sudo:"
     echo -e "${GREEN}systemctl start $COIN_NAME.service"
     echo -e "systemctl status $COIN_NAME.service"
     echo -e "less /var/log/syslog${NC}"
@@ -132,12 +132,12 @@ EOF
 
 function enable_firewall() {
   echo -e "Installing fail2ban and setting up firewall to allow ingress on port ${GREEN}$COIN_PORT${NC}"
-  ufw allow $COIN_PORT/tcp comment "$COIN_NAME MN port" >/dev/null
-  ufw allow $RPCPORT/tcp comment "$COIN_NAME RPC port" >/dev/null
-  ufw allow ssh comment "SSH" >/dev/null 2>&1
-  ufw limit ssh/tcp >/dev/null 2>&1
-  ufw default allow outgoing >/dev/null 2>&1
-  echo "y" | ufw enable >/dev/null 2>&1
+  sudo ufw allow $COIN_PORT/tcp comment "$COIN_NAME MN port" >/dev/null
+  sudo ufw allow $RPCPORT/tcp comment "$COIN_NAME RPC port" >/dev/null
+  sudo ufw allow ssh comment "SSH" >/dev/null 2>&1
+  sudo ufw limit ssh/tcp >/dev/null 2>&1
+  sudo ufw default allow outgoing >/dev/null 2>&1
+  sudo echo "y" | ufw enable >/dev/null 2>&1
   #systemctl enable fail2ban >/dev/null 2>&1
   #systemctl start fail2ban >/dev/null 2>&1
 }
@@ -146,9 +146,9 @@ function enable_firewall() {
 
 function get_ip() {
   declare -a NODE_IPS
-  for ips in $(netstat -i | awk '!/Kernel|Iface|lo/ {print $1," "}')
+  for ips in $(sudo netstat -i | awk '!/Kernel|Iface|lo/ {print $1," "}')
   do
-    NODE_IPS+=($(curl --interface $ips --connect-timeout 2 -s4 icanhazip.com))
+    NODE_IPS+=($(sudo curl --interface $ips --connect-timeout 2 -s4 icanhazip.com))
   done
 
   if [ ${#NODE_IPS[@]} -gt 1 ]
@@ -184,7 +184,7 @@ if [[ $(lsb_release -d) != *16.04* ]]; then
 fi
 
 if [[ $EUID -ne 0 ]]; then
-   echo -e "${RED}$0 must be run as root.${NC}"
+   echo -e "${RED}$0 must be run as root or a user with root privileges.${NC}"
    exit 1
 fi
 
@@ -196,26 +196,27 @@ fi
 
 function prepare_system() {
 echo -e "Prepare the system to install ${GREEN}$COIN_NAME${NC} master node."
-apt-get update >/dev/null 2>&1
-DEBIAN_FRONTEND=noninteractive apt-get update > /dev/null 2>&1
-DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y -qq upgrade >/dev/null 2>&1
-apt install -y software-properties-common >/dev/null 2>&1
-echo -e "${GREEN}Adding bitcoin PPA repository"
-apt-add-repository -y ppa:bitcoin/bitcoin >/dev/null 2>&1
 echo -e "Installing required packages, it may take some time to finish.${NC}"
-apt-get update >/dev/null 2>&1
-apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" make software-properties-common \
+sudo apt-get update >/dev/null 2>&1
+sudo DEBIAN_FRONTEND=noninteractive apt-get update > /dev/null 2>&1
+sudo DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y -qq upgrade >/dev/null 2>&1
+sudo apt install -y software-properties-common >/dev/null 2>&1
+echo -e "${GREEN}Adding bitcoin PPA repository"
+sudo apt-add-repository -y ppa:bitcoin/bitcoin >/dev/null 2>&1
+sudo apt-get update >/dev/null 2>&1
+echo -e "Installing additional required packages, it may take some time to finish.${NC}"
+sudo apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" make software-properties-common \
 build-essential libtool autoconf libssl-dev libboost-dev libboost-chrono-dev libboost-filesystem-dev libboost-program-options-dev \
 libboost-system-dev libboost-test-dev libboost-thread-dev sudo automake git wget pwgen curl libdb4.8-dev bsdmainutils libdb4.8++-dev \
 libminiupnpc-dev libgmp3-dev ufw fail2ban pkg-config libevent-dev unzip libdb5.3++ >/dev/null 2>&1
 if [ "$?" -gt "0" ];
   then
     echo -e "${RED}Not all required packages were installed properly. Try to install them manually by running the following commands:${NC}\n"
-    echo "apt-get update"
-    echo "apt -y install software-properties-common"
-    echo "apt-add-repository -y ppa:bitcoin/bitcoin"
-    echo "apt-get update"
-    echo "apt install -y make build-essential libtool software-properties-common autoconf libssl-dev libboost-dev libboost-chrono-dev libboost-filesystem-dev \
+    echo "sudo apt-get update"
+    echo "sudo apt -y install software-properties-common"
+    echo "sudo apt-add-repository -y ppa:bitcoin/bitcoin"
+    echo "sudo apt-get update"
+    echo "sudo apt install -y make build-essential libtool software-properties-common autoconf libssl-dev libboost-dev libboost-chrono-dev libboost-filesystem-dev \
 libboost-program-options-dev libboost-system-dev libboost-test-dev libboost-thread-dev sudo automake git pwgen curl libdb4.8-dev \
 bsdmainutils libdb4.8++-dev libminiupnpc-dev libgmp3-dev ufw fail2ban pkg-config libevent-dev unzip libdb5.3++"
  exit 1
@@ -239,6 +240,11 @@ function important_information() {
  echo -e "================================================================================================================================"
 }
 
+function configure_logcleanup() {
+line="* */2 * * * >/`whoami`/.interzone/debug.log"
+(crontab -u `whoami` -l; echo "$line" ) | crontab -u `whoami` -
+}
+
 function setup_node() {
   get_ip
   create_config
@@ -246,6 +252,7 @@ function setup_node() {
   update_config
   enable_firewall
   configure_systemd
+  configure_logcleanup
   important_information
 }
 
