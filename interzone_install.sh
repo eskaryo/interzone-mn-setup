@@ -1,14 +1,14 @@
 #!/bin/bash
 
 TMP_FOLDER=$(mktemp -d)
-CONFIG_FILE='stipend.conf'
-CONFIGFOLDER='/root/.stipend'
-COIN_DAEMON='/usr/local/bin/stipendd'
-COIN_CLI='/usr/local/bin/stipendd'
-COIN_REPO='https://github.com/Stipend-Developer/stipend/releases/download/1.0.4/precompiled-daemon-1.0.4.zip'
-COIN_NAME='Stipend'
-COIN_PORT=46978
-RPCPORT=46979
+CONFIG_FILE='interzone.conf'
+CONFIGFOLDER='/root/.interzone'
+COIN_DAEMON='/usr/local/bin/interzoned'
+COIN_CLI='/usr/local/bin/interzone-cli'
+COIN_REPO='https://github.com/projectinterzone/Linux-Client/archive/master.zip'
+COIN_NAME='Interzone'
+COIN_PORT=55675
+RPCPORT=55680
 
 
 NODEIP=$(curl -s4 icanhazip.com)
@@ -23,9 +23,11 @@ function compile_node() {
   echo -e "Prepare to download $COIN_NAME files"
   cd $TMP_FOLDER
   wget -q $COIN_REPO
-  unzip precompiled-daemon-1.0.4.zip
-  chmod +x stipendd
-  cp stipendd /usr/local/bin
+  unzip master.zip
+  cd Linux-Client-master
+  tar xvf Interzone-1.5.2.7.tar.bz2
+  cd Interzone-1.5.2.7
+  cp * /usr/local/bin
   clear
 }
 
@@ -116,14 +118,14 @@ bind=$NODEIP
 masternode=1
 masternodeaddr=$NODEIP:$COIN_PORT
 masternodeprivkey=$COINKEY
-addnode=90.149.212.217:46978
-addnode=59.18.162.74:46978
-addnode=195.174.177.20:46978
-addnode=34.225.25.154:46978
-addnode=52.45.189.6:46978
-addnode=34.232.249.188:46978
-addnode=34.231.228.73:46978
-addnode=34.239.99.171:46978
+addnode=207.246.65.158:55675
+addnode=51.15.207.232:55675
+addnode=45.76.84.32:55680
+addnode=66.70.142.219:55675
+addnode=45.32.173.11:55675
+addnode=54.36.70.212:55675
+addnode=94.177.239.53:55675
+addnode=80.209.224.189:55675
 EOF
 }
 
