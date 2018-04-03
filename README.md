@@ -15,18 +15,17 @@ After the MN is up and running, you need to configure the desktop wallet accordi
 2. Go to RECEIVE and create a New Address: **MN1**  
 3. Send **5000** ITZ to **MN1**.  
 4. Wait for 30 confirmations.  
-5. Go to **Help -> "Debug window - Console"**  
+5. Go to **Command Line Interface tab"**  
 6. Type the following command: **masternode outputs**  
-7. Go to **Masternodes** tab  
-8. Click **Create** and fill the details:  
-* Alias: **MN1**  
-* Address: **VPS_IP:PORT**  
-* Privkey: **Masternode Private Key**  
+7. Edit %appdata%\interzone\masternode.conf
+8. Add a line with the following information separated as follows:
+NICKNAME ADDRESS:PORT MASTERNODEGENKEY TXHASH TX-ID
 * TxHash: **First value from Step 6**  
-* Output index:  **Second value from Step 6**  
-* Reward address: leave blank  
-* Reward %: leave blank  
-9. Click **OK** to add the masternode  
+* TX-ID:  **Second value from Step 6**  
+9. Save masternode.conf and restart wallet
+10. Go to 'NetworkNodes tab'
+11. Choose 'My NetworkNodes'
+12. Select MN1 from the list
 10. Click **Start All**  
 
 ***
