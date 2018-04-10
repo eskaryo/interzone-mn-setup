@@ -4,7 +4,7 @@ Shell script to install a [Interzone Masternode](http://interzone.space) on a Li
 ***
 ## Installation:  
 
-wget -q https://raw.githubusercontent.com/eskaryo/interzone-mn-setup/master/interzone_install.sh
+wget -q https://raw.githubusercontent.com/eskaryo/interzone-mn-setup/master/interzone_install.sh  
 bash interzone_install.sh
 ***
 
